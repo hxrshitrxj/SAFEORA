@@ -1,0 +1,241 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         String    @default("USER") // USER, ADMIN
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions         Session[]
+  documents        Document[]
+  securityEvents   SecurityEvent[]
+  incidents        SecurityIncident[]
+  rehearsalRuns    RehearsalRun[]
+  securitySettings UserSecuritySettings?
+
+  @@index([email])
+}
+
+model Session {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token          String    @unique
+  ipAddress      String?
+  userAgent      String?
+  expiresAt      DateTime
+  isRevoked      Boolean   @default(false)
+  revocationNote String?
+  createdAt      DateTime  @default(now())
+  lastActivityAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+model Document {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filename        String
+  mimeType        String
+  sizeBytes       Int
+  currentVersion  Int       @default(1)
+  isEncrypted     Boolean   @default(true)
+  encryptionAlgo  String    @default("AES-256-GCM")
+  integrityStatus String    @default("VERIFIED") // VERIFIED, CORRUPTED, TAMPERED, PENDING
+  lastVerifiedAt  DateTime?
+  isRestricted    Boolean   @default(false)
+  restrictionReason String?
+  deletedAt       DateTime? // Soft-delete to preserve audit & recovery history
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  versions        DocumentVersion[]
+  recoveryRecords RecoveryRecord[]
+
+  @@index([userId])
+  @@index([integrityStatus])
+}
+
+model DocumentVersion {
+  id              String            @id @default(cuid())
+  documentId      String
+  document        Document          @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  versionNumber   Int
+  storagePath     String
+  recoveryPath    String?           // Path in independent recovery storage namespace
+  sizeBytes       Int
+  integrityStatus String            @default("VERIFIED") // VERIFIED, CORRUPTED, TAMPERED
+  recoveryStatus  String            @default("ELIGIBLE") // ELIGIBLE, RESTRICTED, RESTORED, CORRUPTED
+  parentVersionId String?
+  createdAt       DateTime          @default(now())
+
+  manifest        IntegrityManifest?
+
+  @@unique([documentId, versionNumber])
+  @@index([documentId])
+}
+
+model IntegrityManifest {
+  id                    String          @id @default(cuid())
+  versionId             String          @unique
+  version               DocumentVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  documentId            String
+  versionNumber         Int
+  manifestSchemaVersion String          @default("1.0.0")
+  hashAlgorithm         String          @default("SHA-256")
+  chunkSizeBytes        Int             @default(65536) // 64KB chunks
+  chunkHashes           String          // JSON array of ordered hashes
+  merkleRoot            String
+  canonicalPayload      String          // Serialized deterministic manifest payload
+  signature             String          // Cryptographic digital signature
+  signerKeyId           String          @default("phoenix-kms-key-v1")
+  verifiedAt            DateTime?
+  createdAt             DateTime        @default(now())
+
+  @@index([documentId])
+  @@index([versionNumber])
+}
+
+model RecoveryRecord {
+  id                   String   @id @default(cuid())
+  documentId           String
+  document             Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  versionNumber        Int
+  restoredFromVersion  Int
+  requestedByUserId    String
+  status               String   @default("SUCCESS") // SUCCESS, FAILED, BLOCKED
+  reason               String?
+  verifiedBeforeRestore Boolean @default(true)
+  createdAt            DateTime @default(now())
+
+  @@index([documentId])
+  @@index([requestedByUserId])
+}
+
+model SecurityEvent {
+  id           String   @id @default(cuid())
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  eventType    String   // INTEGRITY_FAILURE, UNAUTHORIZED_ACCESS, BULK_ACTIVITY, SIGNATURE_INVALID, VERSION_ROLLBACK, SESSION_REVOCATION, LOGIN_SUCCESS, LOGIN_FAILED, RECOVERY_ATTEMPT
+  severity     String   // INFO, LOW, MEDIUM, HIGH, CRITICAL
+  resourceType String?  // DOCUMENT, SESSION, USER, MANIFEST, RECOVERY
+  resourceId   String?
+  details      String?  // JSON string
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([severity])
+  @@index([createdAt])
+}
+
+model SecurityIncident {
+  id                  String    @id @default(cuid())
+  userId              String?
+  user                User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  incidentNumber      String    @unique
+  title               String
+  severity            String    // LOW, MEDIUM, HIGH, CRITICAL
+  status              String    @default("OPEN") // OPEN, INVESTIGATING, CONTAINED, RECOVERING, RESOLVED, FALSE_POSITIVE
+  detectionSource     String    // INTEGRITY_MONITOR, SESSION_GUARD, RATE_DETECTOR, MANUAL, REHEARSAL
+  affectedResourceId  String?
+  affectedResourceType String?
+  actionsTaken        String?   // JSON array of actions
+  notes               String?
+  rehearsalRunId      String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  resolvedAt          DateTime?
+
+  @@index([userId])
+  @@index([status])
+  @@index([severity])
+}
+
+model RehearsalRun {
+  id               String                    @id @default(cuid())
+  userId           String
+  user             User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  runNumber        Int
+  status           String                    @default("IDLE") // IDLE, PREPARING, RUNNING, VERIFYING, COMPLETED, FAILED, CANCELLED
+  totalScenarios   Int                       @default(5)
+  passedScenarios  Int                       @default(0)
+  failedScenarios  Int                       @default(0)
+  executionTimeMs  Int                       @default(0)
+  errorSummary     String?
+  createdAt        DateTime                  @default(now())
+  completedAt      DateTime?
+
+  scenarios        RehearsalScenarioResult[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model RehearsalScenarioResult {
+  id                 String       @id @default(cuid())
+  rehearsalRunId     String
+  rehearsalRun       RehearsalRun @relation(fields: [rehearsalRunId], references: [id], onDelete: Cascade)
+  scenarioKey        String       // SCENARIO_A_DOC_TAMPER, SCENARIO_B_MANIFEST_TAMPER, SCENARIO_C_UNAUTHORIZED_SESSION, SCENARIO_D_RECOVERY_PROOF, SCENARIO_E_BULK_ACTIVITY
+  name               String
+  description        String
+  expectedOutcome    String
+  actualOutcome      String
+  detectionStatus    String       // DETECTED, UNDETECTED, NOT_APPLICABLE
+  containmentStatus  String       // CONTAINED, NOT_TRIGGERED, FAILED
+  recoveryStatus     String       // RECOVERED, FAILED, NOT_APPLICABLE
+  verificationResult String?
+  passed             Boolean      @default(false)
+  executionTimeMs    Int          @default(0)
+  diagnosticDetails  String?      // JSON string
+  createdAt          DateTime     @default(now())
+
+  @@index([rehearsalRunId])
+  @@index([scenarioKey])
+}
+
+model AuditEvent {
+  id             String   @id @default(cuid())
+  sequenceNumber Int      @unique
+  eventType      String
+  actorId        String?
+  resourceType   String?
+  resourceId     String?
+  outcome        String   // SUCCESS, FAILURE, DENIED
+  details        String?  // JSON string
+  previousHash   String
+  entryHash      String
+  timestamp      DateTime @default(now())
+
+  @@index([eventType])
+  @@index([sequenceNumber])
+}
+
+model UserSecuritySettings {
+  id                        String   @id @default(cuid())
+  userId                    String   @unique
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailAlerts               Boolean  @default(true)
+  notifyIntegrityFailure    Boolean  @default(true)
+  notifySuspiciousActivity  Boolean  @default(true)
+  autoContainSession        Boolean  @default(true)
+  autoQuarantineTampered    Boolean  @default(true)
+  rehearsalRetentionDays    Int      @default(30)
+  defaultVerificationFreq   String   @default("DAILY") // HOURLY, DAILY, WEEKLY, MANUAL
+  updatedAt                 DateTime @updatedAt
+}
