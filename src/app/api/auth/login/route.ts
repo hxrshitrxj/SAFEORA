@@ -112,15 +112,22 @@ export async function POST(req: NextRequest) {
     const { token } = await createSession(user.id, ip, userAgent);
     setSessionCookie(token);
 
+    // Audit log should not block successful authentication if DB is busy
     await logAuditEvent({
       eventType: "LOGIN_SUCCESS",
       actorId: user.id,
       resourceType: "USER",
       resourceId: user.id,
       outcome: "SUCCESS",
+    }).catch((auditErr) => {
+      console.warn("Audit logging warning during login:", auditErr);
     });
 
-    return NextResponse.json({
+    const isSecure =
+      process.env.NODE_ENV === "production" &&
+      (req.headers.get("x-forwarded-proto") === "https" || req.url.startsWith("https://"));
+
+    const response = NextResponse.json({
       success: true,
       user: {
         id: user.id,
@@ -129,8 +136,29 @@ export async function POST(req: NextRequest) {
         role: user.role,
       },
     });
+
+    // Set cookie directly on response object to guarantee browser persistence
+    response.cookies.set("safeora_vault_session", token, {
+      httpOnly: true,
+      secure: isSecure,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60,
+    });
+    response.cookies.set("phoenix_vault_session", token, {
+      httpOnly: true,
+      secure: isSecure,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60,
+    });
+
+    return response;
   } catch (err: any) {
     console.error("Login error:", err);
-    return NextResponse.json({ error: "Authentication failed. Please try again." }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message || "Authentication failed. Please try again." },
+      { status: 500 }
+    );
   }
 }

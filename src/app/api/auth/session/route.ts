@@ -7,7 +7,10 @@ export async function GET() {
   try {
     const auth = await getAuthenticatedUser();
     if (!auth) {
-      return NextResponse.json({ authenticated: false, user: null }, { status: 401 });
+      const res = NextResponse.json({ authenticated: false, user: null }, { status: 401 });
+      res.cookies.delete("safeora_vault_session");
+      res.cookies.delete("phoenix_vault_session");
+      return res;
     }
 
     return NextResponse.json({

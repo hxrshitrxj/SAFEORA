@@ -40,11 +40,11 @@ export default function LoginPage() {
             redirectTarget = customRedirect;
           }
         }
-        router.push(redirectTarget);
+        window.location.href = redirectTarget;
       }
     } catch (err: any) {
-      setFormError("Network or server connection failed.");
-      error("Connection Error", err.message);
+      setFormError(err?.message || "Network or server connection failed.");
+      error("Connection Error", err?.message || "Server connection failed.");
     } finally {
       setLoading(false);
     }
@@ -80,11 +80,11 @@ export default function LoginPage() {
             redirectTarget = customRedirect;
           }
         }
-        router.push(redirectTarget);
+        window.location.href = redirectTarget;
       }
     } catch (err: any) {
-      setFormError("Network or server connection failed.");
-      error("Connection Error", err.message);
+      setFormError(err?.message || "Network or server connection failed.");
+      error("Connection Error", err?.message || "Server connection failed.");
     } finally {
       setLoading(false);
     }

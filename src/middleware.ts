@@ -42,11 +42,6 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // 2. If already logged in and navigating to /login or /register, redirect to /dashboard
-  if (isAuthRoute && sessionToken) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
-
   return NextResponse.next();
 }
 
