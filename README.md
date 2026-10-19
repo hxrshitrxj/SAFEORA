@@ -30,7 +30,7 @@ $$\textbf{Protect} \rightarrow \textbf{Monitor} \rightarrow \textbf{Detect} \rig
 
 - **Frontend**: Next.js 14 (App Router), TypeScript (Strict), Tailwind CSS, Lucide React, Recharts.
 - **Backend**: Next.js Route Handlers, Reusable Service Layer, Zod Validation, Sliding Window Rate Limiting.
-- **Database & ORM**: PostgreSQL-ready Prisma ORM (configured with SQLite for zero-friction local execution, with instant PostgreSQL adapter switching).
+- **Database & ORM**: Prisma ORM with native PostgreSQL (`provider = "postgresql"`), configured for cloud deployment (Supabase, Neon, Railway, Vercel Postgres).
 - **Cryptography**: Web Crypto API (`AES-GCM`, `SHA-256`), Scrypt password hashing with OWASP-recommended cost factors, HMAC/Ed25519 digital signatures.
 - **Storage Abstraction**: Modular `StorageAdapter` supporting local filesystem segregation (Development) and AWS S3 multi-bucket separation (Production).
 - **Test Suite**: Vitest (unit & integration tests).
