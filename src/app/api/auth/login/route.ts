@@ -157,6 +157,15 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (err: any) {
     console.error("Login error:", err);
+    if (err?.code === "P2021" || err?.message?.includes("does not exist")) {
+      return NextResponse.json(
+        {
+          error:
+            "Database tables not initialized. Please run 'npx prisma db push' in your terminal or trigger a deployment build to initialize database tables.",
+        },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       { error: err?.message || "Authentication failed. Please try again." },
       { status: 500 }
