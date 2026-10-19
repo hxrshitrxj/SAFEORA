@@ -50,6 +50,46 @@ export default function LoginPage() {
     }
   };
 
+  const handleInstantDemoLogin = async () => {
+    setEmail("demo@safeora-vault.local");
+    setPassword("SafeoraVaultDemo2026!");
+    setFormError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: "demo@safeora-vault.local",
+          password: "SafeoraVaultDemo2026!",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setFormError(data.error || "Demo authentication failed.");
+        error("Login Failed", data.error || "Please check credentials.");
+      } else {
+        success("Access Granted", `Welcome back, ${data.user.name}`);
+        let redirectTarget = "/dashboard";
+        if (typeof window !== "undefined") {
+          const params = new URLSearchParams(window.location.search);
+          const customRedirect = params.get("redirect");
+          if (customRedirect && customRedirect.startsWith("/")) {
+            redirectTarget = customRedirect;
+          }
+        }
+        router.push(redirectTarget);
+      }
+    } catch (err: any) {
+      setFormError("Network or server connection failed.");
+      error("Connection Error", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fillDemoAccount = () => {
     setEmail("demo@safeora-vault.local");
     setPassword("SafeoraVaultDemo2026!");
@@ -138,16 +178,39 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Quick Demo Account Button */}
-          <div className="mt-5 pt-5 border-t border-navy-800">
+          {/* Instant Demo Access Buttons */}
+          <div className="mt-5 pt-5 border-t border-navy-800 space-y-2.5">
+            <button
+              type="button"
+              disabled={loading}
+              onClick={handleInstantDemoLogin}
+              className="w-full py-2.5 px-3 rounded-xl border border-cyan-400/50 bg-gradient-to-r from-cyan-950/60 via-blue-950/50 to-cyan-950/60 hover:from-cyan-900/60 hover:to-blue-900/60 text-cyan-300 hover:text-white text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all shadow-md shadow-cyan-500/10 disabled:opacity-50"
+            >
+              <Key className="w-4 h-4 text-cyan-400" />
+              <span>⚡ One-Click Demo Access</span>
+            </button>
+
             <button
               type="button"
               onClick={fillDemoAccount}
-              className="w-full py-2 px-3 rounded-lg border border-cyan-500/30 bg-cyan-950/30 text-cyan-300 hover:bg-cyan-900/40 text-xs font-mono flex items-center justify-center gap-2 transition-all"
+              className="w-full py-1.5 px-3 rounded-lg border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 text-[11px] font-mono flex items-center justify-center gap-1.5 transition-all"
             >
-              <Key className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Fill Seed Demo Credentials</span>
+              <span>Auto-Fill Credentials Form</span>
             </button>
+          </div>
+
+          {/* Explicit Credentials Info Box */}
+          <div className="mt-4 p-3 rounded-xl bg-navy-900/90 border border-cyan-500/20 text-xs font-mono flex flex-col gap-1">
+            <div className="flex items-center justify-between text-[10px] text-slate-400">
+              <span className="font-semibold text-slate-300 tracking-wider">SEEDED DEMO CREDENTIALS</span>
+              <span className="text-emerald-400 font-bold px-1.5 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30">READY</span>
+            </div>
+            <div className="text-slate-300 text-[11px] mt-1">
+              User: <span className="text-cyan-300 font-semibold select-all">demo@safeora-vault.local</span>
+            </div>
+            <div className="text-slate-300 text-[11px]">
+              Pass: <span className="text-cyan-300 font-semibold select-all">SafeoraVaultDemo2026!</span>
+            </div>
           </div>
         </div>
 
