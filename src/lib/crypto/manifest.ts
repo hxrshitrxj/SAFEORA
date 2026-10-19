@@ -42,7 +42,7 @@ export interface VerificationResult {
 }
 
 const DEFAULT_CHUNK_SIZE = 64 * 1024; // 64KB
-const SIGNER_KEY_ID = "phoenix-kms-v1";
+const SIGNER_KEY_ID = "safeora-kms-v1";
 
 /**
  * Deterministically serializes JSON according to canonical JSON conventions
@@ -143,7 +143,7 @@ export function computeMerkleRoot(hashes: string[]): string {
  * The private signing key resides in a separated security boundary.
  */
 export function signCanonicalPayload(canonicalPayload: string): string {
-  const secret = process.env.MANIFEST_SIGNING_SECRET || "phoenix_manifest_signing_ed25519_key_secret_vault_guard_2026";
+  const secret = process.env.MANIFEST_SIGNING_SECRET || "safeora_manifest_signing_ed25519_key_secret_vault_guard_2026";
   const hmac = crypto.createHmac("sha256", secret);
   hmac.update(canonicalPayload);
   return hmac.digest("hex");

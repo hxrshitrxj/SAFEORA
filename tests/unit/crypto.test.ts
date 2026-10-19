@@ -16,7 +16,7 @@ import {
 describe("Cryptographic Envelope & WebCrypto AES-256-GCM", () => {
   it("encrypts and decrypts document data with valid key", async () => {
     const key = await generateDocumentKey();
-    const plaintext = new TextEncoder().encode("CONFIDENTIAL_TOP_SECRET_PHOENIX_DATA");
+    const plaintext = new TextEncoder().encode("CONFIDENTIAL_TOP_SECRET_SAFEORA_DATA");
 
     const envelope = await encryptDocument(plaintext.buffer, key);
 
@@ -24,12 +24,12 @@ describe("Cryptographic Envelope & WebCrypto AES-256-GCM", () => {
     expect(envelope.version).toBe("1.0.0");
     expect(envelope.iv).toBeDefined();
     expect(envelope.ciphertext).toBeDefined();
-    expect(envelope.ciphertext).not.toEqual("CONFIDENTIAL_TOP_SECRET_PHOENIX_DATA");
+    expect(envelope.ciphertext).not.toEqual("CONFIDENTIAL_TOP_SECRET_SAFEORA_DATA");
 
     const decryptedBuffer = await decryptDocument(envelope, key);
     const decryptedText = new TextDecoder().decode(decryptedBuffer);
 
-    expect(decryptedText).toBe("CONFIDENTIAL_TOP_SECRET_PHOENIX_DATA");
+    expect(decryptedText).toBe("CONFIDENTIAL_TOP_SECRET_SAFEORA_DATA");
   });
 
   it("fails to decrypt with an incorrect key", async () => {

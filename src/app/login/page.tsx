@@ -32,7 +32,15 @@ export default function LoginPage() {
         error("Login Failed", data.error || "Please check your credentials.");
       } else {
         success("Access Granted", `Welcome back, ${data.user.name}`);
-        router.push("/dashboard");
+        let redirectTarget = "/dashboard";
+        if (typeof window !== "undefined") {
+          const params = new URLSearchParams(window.location.search);
+          const customRedirect = params.get("redirect");
+          if (customRedirect && customRedirect.startsWith("/")) {
+            redirectTarget = customRedirect;
+          }
+        }
+        router.push(redirectTarget);
       }
     } catch (err: any) {
       setFormError("Network or server connection failed.");
@@ -43,8 +51,8 @@ export default function LoginPage() {
   };
 
   const fillDemoAccount = () => {
-    setEmail("demo@phoenix-vault.local");
-    setPassword("PhoenixVaultDemo2026!");
+    setEmail("demo@safeora-vault.local");
+    setPassword("SafeoraVaultDemo2026!");
     setFormError("");
   };
 
@@ -61,7 +69,7 @@ export default function LoginPage() {
               <Shield className="w-6 h-6 text-navy-950 font-bold" />
             </div>
           </Link>
-          <h1 className="text-2xl font-bold tracking-tight text-white font-mono">PHOENIX VAULT</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white font-mono">SAFEORA VAULT</h1>
           <p className="text-sm text-slate-400 mt-1">Authenticate to access protected cryptographic assets</p>
         </div>
 

@@ -1,6 +1,6 @@
-# PHOENIX — Self-Defending Document Vault
+# SAFEORA — Self-Defending Document Vault
 
-PHOENIX is a self-defending document security web application designed to protect sensitive organizational records from tampering, ransomware, and silent bit-rot.
+SAFEORA is a self-defending document security web application designed to protect sensitive organizational records from tampering, ransomware, and silent bit-rot.
 
 Its central concept combines:
 1. **Client-side document encryption** (Web Crypto API AES-256-GCM with unique 96-bit nonces).
@@ -40,7 +40,7 @@ $$\textbf{Protect} \rightarrow \textbf{Monitor} \rightarrow \textbf{Detect} \rig
 ## Project Structure
 
 ```
-phoenix-vault/
+safeora-vault/
   ├── src/
   │   ├── app/
   │   │   ├── page.tsx                     # Public Landing Page
@@ -115,8 +115,8 @@ Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
 ## Demo Credentials
 
-- **Email:** `demo@phoenix-vault.local`
-- **Password:** `PhoenixVaultDemo2026!`
+- **Email:** `demo@safeora-vault.local` (or legacy: `demo@phoenix-vault.local`)
+- **Password:** `SafeoraVaultDemo2026!` (or legacy: `PhoenixVaultDemo2026!`)
 *(Click the "Fill Seed Demo Credentials" button on `/login` to auto-populate)*
 
 ---

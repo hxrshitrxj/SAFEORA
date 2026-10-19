@@ -3,7 +3,8 @@ import { cookies } from "next/headers";
 import prisma from "@/lib/database/prisma";
 import type { Session, User } from "@prisma/client";
 
-export const SESSION_COOKIE_NAME = "phoenix_vault_session";
+export const SESSION_COOKIE_NAME = "safeora_vault_session";
+export const LEGACY_COOKIE_NAME = "phoenix_vault_session";
 const SESSION_EXPIRY_HOURS = parseInt(process.env.SESSION_EXPIRY_HOURS || "24", 10);
 
 export interface AuthenticatedUser {
@@ -63,6 +64,7 @@ export function setSessionCookie(token: string) {
 export function clearSessionCookie() {
   const cookieStore = cookies();
   cookieStore.delete(SESSION_COOKIE_NAME);
+  cookieStore.delete(LEGACY_COOKIE_NAME);
 }
 
 /**
@@ -71,7 +73,9 @@ export function clearSessionCookie() {
 export async function getAuthenticatedUser(): Promise<ActiveSessionContext | null> {
   try {
     const cookieStore = cookies();
-    const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+    const token =
+      cookieStore.get(SESSION_COOKIE_NAME)?.value ||
+      cookieStore.get(LEGACY_COOKIE_NAME)?.value;
 
     if (!token) {
       return null;

@@ -166,7 +166,7 @@ export function CinematicHeader({ onNavigate }: HeaderProps) {
             <div className="flex items-center gap-2.5">
               <span className="w-2 h-2 rounded-full bg-[#FF3D9A] animate-ping" />
               <span className="font-mono text-[11px] sm:text-xs text-white/70 tracking-[0.2em] uppercase font-semibold">
-                PHOENIX VAULT // CENTRAL DIRECTORY
+                SAFEORA VAULT // CENTRAL DIRECTORY
               </span>
             </div>
           </div>

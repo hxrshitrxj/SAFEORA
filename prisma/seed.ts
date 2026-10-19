@@ -7,24 +7,37 @@ import { LocalStorageAdapter } from "../src/lib/storage/local-storage-adapter";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Seeding Phoenix Vault development environment...");
+  console.log("🌱 Seeding Safeora Vault development environment...");
 
-  // 1. Create or upsert Demo User
-  const demoEmail = "demo@phoenix-vault.local";
-  const passwordHash = await hashPassword("PhoenixVaultDemo2026!");
+  // 1. Create or upsert Demo Users (Safeora primary, Phoenix legacy)
+  const primaryEmail = "demo@safeora-vault.local";
+  const primaryPasswordHash = await hashPassword("SafeoraVaultDemo2026!");
 
   const user = await prisma.user.upsert({
-    where: { email: demoEmail },
-    update: { passwordHash },
+    where: { email: primaryEmail },
+    update: { passwordHash: primaryPasswordHash },
     create: {
-      email: demoEmail,
+      email: primaryEmail,
       name: "Security Officer Alex",
-      passwordHash,
+      passwordHash: primaryPasswordHash,
       role: "USER",
     },
   });
 
-  console.log(`👤 Demo User initialized: ${user.email} (Password: PhoenixVaultDemo2026!)`);
+  const legacyEmail = "demo@phoenix-vault.local";
+  const legacyPasswordHash = await hashPassword("PhoenixVaultDemo2026!");
+  await prisma.user.upsert({
+    where: { email: legacyEmail },
+    update: { passwordHash: legacyPasswordHash },
+    create: {
+      email: legacyEmail,
+      name: "Security Officer Alex",
+      passwordHash: legacyPasswordHash,
+      role: "USER",
+    },
+  });
+
+  console.log(`👤 Demo User initialized: ${user.email} (Password: SafeoraVaultDemo2026!)`);
 
   // 2. Initialize User Security Settings
   await prisma.userSecuritySettings.upsert({
@@ -54,7 +67,7 @@ async function main() {
       version: "1.0.0",
       algorithm: "AES-256-GCM",
       iv: Buffer.from(crypto.randomBytes(12)).toString("base64"),
-      ciphertext: Buffer.from("PHOENIX_SYNTHETIC_CIPHERTEXT_ENCRYPTED_DOCUMENT_CONTENT_BLOCK").toString("base64"),
+      ciphertext: Buffer.from("SAFEORA_SYNTHETIC_CIPHERTEXT_ENCRYPTED_DOCUMENT_CONTENT_BLOCK").toString("base64"),
       keyFingerprint: crypto.createHash("sha256").update("demo-key-seed").digest("hex"),
       createdAt: new Date().toISOString(),
     };
@@ -150,7 +163,7 @@ async function main() {
     console.log("🔒 Cryptographic audit log genesis checkpoint established.");
   }
 
-  console.log("✅ Phoenix Vault seed completed successfully.");
+  console.log("✅ Safeora Vault seed completed successfully.");
 }
 
 main()

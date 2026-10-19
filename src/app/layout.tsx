@@ -3,7 +3,7 @@ import "./globals.css";
 import { ToastProvider } from "@/components/shared/toast-context";
 
 export const metadata: Metadata = {
-  title: "PHOENIX — Self-Defending Document Vault",
+  title: "SAFEORA — Self-Defending Document Vault",
   description:
     "Next-generation self-defending document security vault with client-side AES-256-GCM encryption, tamper-evident Merkle manifests, air-gapped recovery, and breach rehearsal proof.",
 };

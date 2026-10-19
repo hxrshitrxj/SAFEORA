@@ -75,7 +75,7 @@ export function DiscoverSection() {
           </h2>
 
           <p className="mt-4 text-sm sm:text-base text-slate-400 font-light leading-relaxed">
-            Every module in Phoenix is wired into real cryptographic routines — from Web Crypto AES-256 envelope keys to Merkle tree chunk manifests.
+            Every module in Safeora is wired into real cryptographic routines — from Web Crypto AES-256 envelope keys to Merkle tree chunk manifests.
           </p>
         </div>
 
@@ -136,7 +136,7 @@ export function DiscoverSection() {
               <Terminal className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="text-base font-bold text-white">Experience Phoenix In Action</h4>
+              <h4 className="text-base font-bold text-white">Experience Safeora In Action</h4>
               <p className="text-xs text-slate-400 font-light">
                 Sign in with demo credentials or initialize a new cryptographic vault now.
               </p>

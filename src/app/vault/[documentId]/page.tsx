@@ -282,7 +282,7 @@ export default function DocumentDetailPage() {
             <div className="p-3 rounded-xl bg-navy-900 border border-navy-800">
               <div className="text-[10px] font-mono text-slate-400">SIGNER KEY IDENTIFIER</div>
               <div className="text-xs font-bold text-cyan-300 font-mono mt-1 truncate">
-                {manifest?.signerKeyId || "phoenix-kms-v1"}
+                {manifest?.signerKeyId || "safeora-kms-v1"}
               </div>
             </div>
           </div>

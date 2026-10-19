@@ -62,7 +62,7 @@ export function MasterCinematicLanding() {
     setActiveSection("hero");
   };
 
-  // Full technical workflow steps preserved from Phoenix Vault
+  // Full technical workflow steps preserved from Safeora Vault
   const workflowSteps = [
     {
       num: "01",
@@ -160,7 +160,7 @@ export function MasterCinematicLanding() {
               Protect → Monitor → Detect → Contain → Verify → Recover → Report
             </p>
             <p className="mt-3 text-slate-400 text-sm leading-relaxed">
-              Phoenix replaces passive file storage with a continuous, closed-loop defensive pipeline.
+              Safeora replaces passive file storage with a continuous, closed-loop defensive pipeline.
             </p>
           </div>
 
@@ -230,7 +230,7 @@ export function MasterCinematicLanding() {
               </h3>
             </div>
             <p className="text-sm text-slate-300 leading-relaxed font-light">
-              Phoenix is engineered with genuine Web Crypto AES-256-GCM primitives and Merkle tree verification. We believe in transparent engineering assumptions:
+              Safeora is engineered with genuine Web Crypto AES-256-GCM primitives and Merkle tree verification. We believe in transparent engineering assumptions:
             </p>
             <ul className="mt-5 space-y-3 text-xs text-slate-300 font-mono">
               <li className="flex items-start gap-2">
@@ -274,7 +274,7 @@ export function MasterCinematicLanding() {
               </g>
             </svg>
             <span className="font-bold text-xs tracking-wider text-white font-mono">
-              PHOENIX VAULT
+              SAFEORA VAULT
             </span>
             <span className="text-[11px] text-slate-500">
               © 2026. Self-Defending Document Security.

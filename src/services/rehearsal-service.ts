@@ -191,7 +191,7 @@ export class RehearsalService {
   private static async executeScenarioB(runId: string, userId: string): Promise<ScenarioExecutionResult> {
     const t0 = Date.now();
     const fixtureId = `synth-manifest-${crypto.randomBytes(4).toString("hex")}`;
-    const testData = Buffer.from("PHOENIX_INTEGRITY_TEST_PAYLOAD", "utf-8");
+    const testData = Buffer.from("SAFEORA_INTEGRITY_TEST_PAYLOAD", "utf-8");
 
     // 1. Generate legitimate manifest
     const legitManifest = createIntegrityManifest(fixtureId, 1, testData);
@@ -249,7 +249,7 @@ export class RehearsalService {
         userId,
         token: testToken,
         ipAddress: "192.0.2.1", // RFC 5737 TEST-NET-1 synthetic IP
-        userAgent: "Phoenix-Synthetic-Tester/1.0",
+        userAgent: "Safeora-Synthetic-Tester/1.0",
         expiresAt: new Date(Date.now() + 3600 * 1000),
         isRevoked: false,
       },
@@ -455,7 +455,7 @@ export class RehearsalService {
 
     if (!run) throw new Error("Rehearsal run not found.");
 
-    const markdown = `# PHOENIX — Breach Rehearsal & Recovery Proof Report
+    const markdown = `# SAFEORA — Breach Rehearsal & Recovery Proof Report
 **Run ID:** ${run.id}
 **Run Number:** #${run.runNumber}
 **Date:** ${run.createdAt.toISOString()}
@@ -490,7 +490,7 @@ ${run.scenarios
   .join("\n")}
 
 ---
-*Report generated cryptographically by PHOENIX Self-Defending Document Vault.*
+*Report generated cryptographically by SAFEORA Self-Defending Document Vault.*
 `;
 
     return {

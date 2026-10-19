@@ -10,7 +10,7 @@ export async function GET() {
 
     return NextResponse.json({
       status: "HEALTHY",
-      service: "PHOENIX — Self-Defending Document Vault",
+      service: "SAFEORA — Self-Defending Document Vault",
       timestamp: new Date().toISOString(),
       database: "CONNECTED",
       storage: storage.getStatus(),

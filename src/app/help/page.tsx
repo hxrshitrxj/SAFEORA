@@ -21,10 +21,10 @@ export default function HelpPage() {
   const sections = [
     {
       id: "concept",
-      title: "1. What is PHOENIX?",
+      title: "1. What is SAFEORA?",
       icon: Shield,
-      content: `PHOENIX is a Self-Defending Document Security Vault designed to protect sensitive organizational records from tampering, ransomware, and silent corruption.
-Unlike traditional cloud storage that passively holds files, PHOENIX actively guards documents through client-side encryption, authenticated Merkle manifests, continuous integrity checks, and automated session containment.`,
+      content: `SAFEORA is a Self-Defending Document Security Vault designed to protect sensitive organizational records from tampering, ransomware, and silent corruption.
+Unlike traditional cloud storage that passively holds files, SAFEORA actively guards documents through client-side encryption, authenticated Merkle manifests, continuous integrity checks, and automated session containment.`,
     },
     {
       id: "encryption",
@@ -51,14 +51,14 @@ Unlike traditional cloud storage that passively holds files, PHOENIX actively gu
       title: "4. Independent Recovery Copies & Pre-Verification",
       icon: RotateCcw,
       content: `• Segregated Storage: Every version upload generates an immutable replica in a separate recovery storage namespace.
-• Pre-Restoration Verification: Before any recovery copy can overwrite or roll forward an active document, PHOENIX re-verifies the digital signature and chunk hashes of the recovery replica.
+• Pre-Restoration Verification: Before any recovery copy can overwrite or roll forward an active document, SAFEORA re-verifies the digital signature and chunk hashes of the recovery replica.
 • Anti-Rollback Defense: Version numbers strictly increment. An attacker cannot force rollback to an obsolete or insecure prior version.`,
     },
     {
       id: "rehearsal",
       title: "5. Breach Rehearsal & Recovery Proof Engine",
       icon: Flame,
-      content: `PHOENIX features a built-in rehearsal suite that executes 5 real, controlled security scenarios within isolated synthetic fixtures:
+      content: `SAFEORA features a built-in rehearsal suite that executes 5 real, controlled security scenarios within isolated synthetic fixtures:
 • Scenario A (Document Tampering): Proves that changing a single byte in ciphertext triggers chunk and Merkle root failure.
 • Scenario B (Manifest Tampering): Proves that forging manifest metadata without the private signing key fails signature authentication.
 • Scenario C (Unauthorized Session): Confirms automated containment revokes a rogue session without disrupting valid users.

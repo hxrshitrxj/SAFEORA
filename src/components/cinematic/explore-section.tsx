@@ -49,7 +49,7 @@ export function ExploreSection() {
       num: "04",
       title: "Isolated Recovery Promotion",
       subtitle: "Pre-Verified Air-Gapped Restore",
-      desc: "Recovery replicas are maintained in segregated storage. Before restoring, Phoenix cryptographically verifies the clean copy against tamper-proof manifests.",
+      desc: "Recovery replicas are maintained in segregated storage. Before restoring, Safeora cryptographically verifies the clean copy against tamper-proof manifests.",
       icon: Shield,
       status: "STANDBY",
       color: "#00f2fe",

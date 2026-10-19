@@ -4,7 +4,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
 }
 
 model User {
@@ -101,7 +102,7 @@ model IntegrityManifest {
   merkleRoot            String
   canonicalPayload      String          // Serialized deterministic manifest payload
   signature             String          // Cryptographic digital signature
-  signerKeyId           String          @default("phoenix-kms-key-v1")
+  signerKeyId           String          @default("safeora-kms-key-v1")
   verifiedAt            DateTime?
   createdAt             DateTime        @default(now())
 

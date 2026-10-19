@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Shield,
   FileText,
@@ -39,7 +39,6 @@ interface UserSession {
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { success, error } = useToast();
 
   const [user, setUser] = useState<UserSession | null>(null);
@@ -49,11 +48,14 @@ export function AppShell({ children }: AppShellProps) {
 
   // Check initial URL query param (e.g. ?nav=open or ?nav=3d)
   useEffect(() => {
-    const navParam = searchParams?.get("nav");
-    if (navParam === "open" || navParam === "3d") {
-      setIs3dNavOpen(true);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const navParam = params.get("nav");
+      if (navParam === "open" || navParam === "3d") {
+        setIs3dNavOpen(true);
+      }
     }
-  }, [searchParams]);
+  }, [pathname]);
 
   // Auth verification
   useEffect(() => {
@@ -147,13 +149,21 @@ export function AppShell({ children }: AppShellProps) {
 
   const ActiveIcon = activeCategory.icon;
 
-  if (loading) {
+  if (loading || !user) {
     return (
-      <div className="min-h-screen bg-[#030610] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-          <div className="text-sm text-cyan-300 font-mono tracking-wider">
-            INITIALIZING PHOENIX VAULT...
+      <div className="min-h-screen bg-[#030610] flex items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-4 text-center max-w-sm">
+          <div className="w-14 h-14 rounded-2xl bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <Lock className="w-7 h-7 text-cyan-400 animate-pulse" />
+          </div>
+          <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+          <div>
+            <div className="text-sm font-bold text-white font-mono tracking-wider">
+              SAFEORA VAULT // LOCKED
+            </div>
+            <div className="text-xs text-slate-400 mt-1 font-mono">
+              Verifying cryptographic session token...
+            </div>
           </div>
         </div>
       </div>
@@ -186,7 +196,7 @@ export function AppShell({ children }: AppShellProps) {
             </div>
             <div className="hidden sm:flex flex-col">
               <span className="font-bold text-sm tracking-wider text-white font-mono">
-                PHOENIX
+                SAFEORA
               </span>
               <span className="text-[10px] text-cyan-400 font-mono uppercase tracking-widest -mt-0.5">
                 Self-Defending

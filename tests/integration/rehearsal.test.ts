@@ -13,7 +13,7 @@ describe("Breach Rehearsal & Recovery Proof Suite (Integration)", () => {
     } else {
       const created = await prisma.user.create({
         data: {
-          email: "integration-tester@phoenix.local",
+          email: "integration-tester@safeora.local",
           name: "Integration Tester",
           passwordHash: "test_hash",
         },

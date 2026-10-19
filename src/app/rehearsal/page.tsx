@@ -108,7 +108,7 @@ export default function RehearsalPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `phoenix-rehearsal-report-run${selectedRun.runNumber}.md`;
+      a.download = `safeora-rehearsal-report-run${selectedRun.runNumber}.md`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

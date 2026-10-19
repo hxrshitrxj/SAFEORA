@@ -42,8 +42,16 @@ export default function RegisterPage() {
         setFormError(data.error || "Registration failed.");
         error("Registration Failed", data.error);
       } else {
-        success("Vault Initialized", `Welcome to Phoenix Vault, ${data.user.name}`);
-        router.push("/dashboard");
+        success("Vault Initialized", `Welcome to Safeora Vault, ${data.user.name}`);
+        let redirectTarget = "/dashboard";
+        if (typeof window !== "undefined") {
+          const params = new URLSearchParams(window.location.search);
+          const customRedirect = params.get("redirect");
+          if (customRedirect && customRedirect.startsWith("/")) {
+            redirectTarget = customRedirect;
+          }
+        }
+        router.push(redirectTarget);
       }
     } catch (err: any) {
       setFormError("Network or server connection failed.");
