@@ -42,6 +42,16 @@ export default function RegisterPage() {
         setFormError(data.error || "Registration failed.");
         error("Registration Failed", data.error);
       } else {
+        if (data.token && typeof window !== "undefined") {
+          try {
+            localStorage.setItem("safeora_session_token", data.token);
+            localStorage.setItem("phoenix_session_token", data.token);
+            document.cookie = `safeora_vault_session=${data.token}; path=/; max-age=604800; SameSite=Lax`;
+            document.cookie = `phoenix_vault_session=${data.token}; path=/; max-age=604800; SameSite=Lax`;
+          } catch (e) {
+            console.warn("Could not save token locally:", e);
+          }
+        }
         success("Vault Initialized", `Welcome to Safeora Vault, ${data.user.name}`);
         let redirectTarget = "/dashboard";
         if (typeof window !== "undefined") {
@@ -51,7 +61,7 @@ export default function RegisterPage() {
             redirectTarget = customRedirect;
           }
         }
-        router.push(redirectTarget);
+        window.location.href = redirectTarget;
       }
     } catch (err: any) {
       setFormError("Network or server connection failed.");

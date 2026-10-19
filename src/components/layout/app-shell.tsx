@@ -57,12 +57,25 @@ export function AppShell({ children }: AppShellProps) {
     }
   }, [pathname]);
 
-  // Auth verification
+  // Auth verification (checks cookies + localStorage fallback for cookie-restricted browsers)
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch("/api/auth/session");
+        const localToken = typeof window !== "undefined"
+          ? (localStorage.getItem("safeora_session_token") || localStorage.getItem("phoenix_session_token"))
+          : null;
+        const headers: Record<string, string> = {};
+        if (localToken) {
+          headers["Authorization"] = `Bearer ${localToken}`;
+          headers["x-session-token"] = localToken;
+        }
+
+        const res = await fetch("/api/auth/session", { headers });
         if (!res.ok) {
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("safeora_session_token");
+            localStorage.removeItem("phoenix_session_token");
+          }
           router.push("/login");
           return;
         }
@@ -70,6 +83,10 @@ export function AppShell({ children }: AppShellProps) {
         if (data.authenticated) {
           setUser(data.user);
         } else {
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("safeora_session_token");
+            localStorage.removeItem("phoenix_session_token");
+          }
           router.push("/login");
         }
       } catch {
@@ -107,11 +124,15 @@ export function AppShell({ children }: AppShellProps) {
 
   const handleLogout = async () => {
     try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("safeora_session_token");
+        localStorage.removeItem("phoenix_session_token");
+      }
       await fetch("/api/auth/logout", { method: "POST" });
       success("Logged out", "Session terminated securely.");
-      router.push("/login");
+      window.location.href = "/login";
     } catch {
-      router.push("/login");
+      window.location.href = "/login";
     }
   };
 

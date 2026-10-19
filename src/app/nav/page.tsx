@@ -11,7 +11,16 @@ export default function NavPage() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch("/api/auth/session");
+        const localToken = typeof window !== "undefined"
+          ? (localStorage.getItem("safeora_session_token") || localStorage.getItem("phoenix_session_token"))
+          : null;
+        const headers: Record<string, string> = {};
+        if (localToken) {
+          headers["Authorization"] = `Bearer ${localToken}`;
+          headers["x-session-token"] = localToken;
+        }
+
+        const res = await fetch("/api/auth/session", { headers });
         if (!res.ok) {
           router.push("/login");
           return;

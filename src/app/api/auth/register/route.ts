@@ -69,8 +69,13 @@ export async function POST(req: NextRequest) {
       details: { email: user.email },
     });
 
-    return NextResponse.json({
+    const isSecure =
+      process.env.NODE_ENV === "production" &&
+      (req.headers.get("x-forwarded-proto") === "https" || req.url.startsWith("https://"));
+
+    const response = NextResponse.json({
       success: true,
+      token,
       user: {
         id: user.id,
         email: user.email,
@@ -78,6 +83,23 @@ export async function POST(req: NextRequest) {
         role: user.role,
       },
     });
+
+    response.cookies.set("safeora_vault_session", token, {
+      httpOnly: true,
+      secure: isSecure,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60,
+    });
+    response.cookies.set("phoenix_vault_session", token, {
+      httpOnly: true,
+      secure: isSecure,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60,
+    });
+
+    return response;
   } catch (err: any) {
     console.error("Register error:", err);
     return NextResponse.json({ error: "Registration failed. Please try again." }, { status: 500 });

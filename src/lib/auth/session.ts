@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import prisma from "@/lib/database/prisma";
 import type { Session, User } from "@prisma/client";
 
@@ -48,34 +48,57 @@ export async function createSession(
  * Sets the secure session cookie on Next.js Response/cookies.
  */
 export function setSessionCookie(token: string) {
-  const cookieStore = cookies();
-  cookieStore.set(SESSION_COOKIE_NAME, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_EXPIRY_HOURS * 60 * 60,
-  });
+  try {
+    const cookieStore = cookies();
+    cookieStore.set(SESSION_COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: false, // Allows both http (localhost, intranet) and https without browser cookie rejection
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_EXPIRY_HOURS * 60 * 60,
+    });
+  } catch {}
 }
 
 /**
  * Clears the session cookie.
  */
 export function clearSessionCookie() {
-  const cookieStore = cookies();
-  cookieStore.delete(SESSION_COOKIE_NAME);
-  cookieStore.delete(LEGACY_COOKIE_NAME);
+  try {
+    const cookieStore = cookies();
+    cookieStore.delete(SESSION_COOKIE_NAME);
+    cookieStore.delete(LEGACY_COOKIE_NAME);
+  } catch {}
 }
 
 /**
- * Verifies current session token from cookies against database and active status.
+ * Verifies current session token from cookies OR headers against database and active status.
+ * Supports standard cookies, Authorization Bearer tokens, and x-session-token headers.
  */
-export async function getAuthenticatedUser(): Promise<ActiveSessionContext | null> {
+export async function getAuthenticatedUser(explicitToken?: string | null): Promise<ActiveSessionContext | null> {
   try {
-    const cookieStore = cookies();
-    const token =
-      cookieStore.get(SESSION_COOKIE_NAME)?.value ||
-      cookieStore.get(LEGACY_COOKIE_NAME)?.value;
+    let token = explicitToken;
+
+    if (!token) {
+      try {
+        const cookieStore = cookies();
+        token =
+          cookieStore.get(SESSION_COOKIE_NAME)?.value ||
+          cookieStore.get(LEGACY_COOKIE_NAME)?.value;
+      } catch {}
+    }
+
+    if (!token) {
+      try {
+        const headerStore = headers();
+        const authHeader = headerStore.get("authorization");
+        if (authHeader?.startsWith("Bearer ")) {
+          token = authHeader.substring(7).trim();
+        } else {
+          token = headerStore.get("x-session-token") || undefined;
+        }
+      } catch {}
+    }
 
     if (!token) {
       return null;
