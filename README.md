@@ -109,7 +109,7 @@ npm test
 ```bash
 npm run dev
 ```
-Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+Open **[https://safeora73.vercel.app/](https://safeora73.vercel.app/)** in your browser.
 
 ---
 
